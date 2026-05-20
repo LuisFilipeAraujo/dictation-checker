@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Dictation Checker</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="page-wrapper">
+
+  <header>
+    <h1>Dictation Checker</h1>
+  </header>
+
+  <!-- Student info -->
+  <div class="card" id="setup-card">
+    <p class="card-title">Student Info</p>
+    <div class="fields-row">
+      <div class="field-group">
+        <label for="student-name">Student Name</label>
+        <input type="text" id="student-name" placeholder="e.g. Maria Silva" autocomplete="off">
+      </div>
+      <div class="field-group">
+        <label for="dictation-num">Dictation Number</label>
+        <select id="dictation-num">
+          <option value="">— select —</option>
+          <option value="118">Dictation 118</option>
+          <option value="119">Dictation 119</option>
+          <option value="120">Dictation 120</option>
+          <option value="121">Dictation 121</option>
+          <option value="122">Dictation 122</option>
+          <option value="123">Dictation 123</option>
+          <option value="124">Dictation 124</option>
+          <option value="125">Dictation 125</option>
+          <option value="126">Dictation 126</option>
+          <option value="127">Dictation 127</option>
+          <option value="128">Dictation 128</option>
+          <option value="129">Dictation 129</option>
+          <option value="130">Dictation 130</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dictation input -->
+  <div class="card">
+    <p class="card-title">Student's Dictation</p>
+    <div class="field-group">
+      <label for="student-text">Type what you heard</label>
+      <textarea id="student-text" placeholder="Type the dictation here exactly as you heard it…"></textarea>
+    </div>
+    <button class="btn-check" onclick="checkDictation()">Check Dictation</button>
+    <button class="btn-reset" onclick="resetAll()">Start Over</button>
+  </div>
+
+  <!-- Results -->
+  <div class="card" id="results">
+    <p class="card-title">Results</p>
+
+    <div class="student-header">
+      <span>Student</span>
+      <span id="res-name">—</span>
+      &nbsp;·&nbsp;
+      <span>Dictation</span>
+      <span id="res-num">—</span>
+    </div>
+
+    <div id="grade-badge" class="grade-label grade-b">—</div>
+
+    <div class="score-banner">
+      <div class="score-stat stat-wrong">
+        <span class="num" id="wrong-words">0</span>
+        <span class="lbl">Errors</span>
+      </div>
+    </div>
+
+    <p class="diff-title">Comparison — Reference vs Student</p>
+    <div class="diff-text" id="diff-output"></div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot ld-err"></div> Wrong word</div>
+      <div class="legend-item"><div class="legend-dot ld-miss"></div> Missing word</div>
+      <div class="legend-item"><div class="legend-dot ld-extra"></div> Extra word</div>
+    </div>
+  </div>
+
+</div>
+<script src="app.js"></script>
+</body>
+</html>
