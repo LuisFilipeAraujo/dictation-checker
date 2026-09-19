@@ -15,8 +15,6 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
-    // Pre-migration app, kept for visual reference until the UI port lands.
-    "legacy/**",
   ]),
 ]);
 
