@@ -20,10 +20,10 @@ export default defineConfig({
       // The `text` table renders empty on Windows paths; `text-summary`
       // prints the totals correctly and `html` carries the per-line detail.
       reporter: ["text-summary", "html"],
-      // Only the marking logic carries rules worth measuring; the UI is
-      // covered by driving the app, not by line counts.
-      include: ["lib/**/*.ts"],
-      exclude: ["lib/**/*.test.ts", "lib/dictations.ts"],
+      include: ["lib/**/*.ts", "components/**/*.tsx"],
+      // The reference texts are data, not logic — their integrity is checked
+      // by lib/dictations.test.ts rather than by line counts.
+      exclude: ["**/*.test.{ts,tsx}", "lib/dictations.ts"],
     },
   },
 });
