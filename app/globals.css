@@ -1,26 +1,58 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Union Flag — official colours (Pantone 280 C / 186 C). */
+  --color-union-blue: #012169;
+  --color-union-blue-deep: #00113a;
+  --color-union-red: #c8102e;
+
+  /* Parchment and institutional neutrals. */
+  --color-parchment: #f7f3ea;
+  --color-parchment-deep: #ede6d8;
+  --color-gold: #b3934f;
+  --color-racing-green: #1f5c3d;
+
+  --color-ink: #14192a;
+  --color-ink-2: #333d55;
+  --color-ink-3: #5f6a80;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Baskerville and Gill Sans are the English typographic signature; Cabin is
+     drawn from Gill Sans, which is also kept as a local fallback. */
+  --font-display: var(--font-baskerville), Baskerville, Georgia, serif;
+  --font-ui: var(--font-cabin), "Gill Sans", "Gill Sans MT", sans-serif;
+  --font-body: var(--font-lora), Georgia, serif;
+  --font-accent: var(--font-cormorant), Georgia, serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  /* The design is parchment throughout — no dark variant. */
+  color-scheme: light;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-parchment);
+  /* Parchment with faint ruled lines, like an exercise book. */
+  background-image:
+    linear-gradient(180deg, rgb(255 255 255 / 0.55) 0%, rgb(237 230 216 / 0.55) 100%),
+    repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent 25px,
+      rgb(1 33 105 / 0.045) 25px,
+      rgb(1 33 105 / 0.045) 26px
+    );
+}
+
+/* Union Flag hoist: navy field with white and red fimbriation. */
+.union-bar {
+  background: linear-gradient(180deg, #012169 0 6px, #ffffff 6px 8px, #c8102e 8px 10px);
+}
+
+/* Native select arrow, tinted to the Union blue. */
+.select-field {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23012169' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
 }
