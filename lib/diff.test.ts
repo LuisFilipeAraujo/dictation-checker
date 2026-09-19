@@ -73,7 +73,8 @@ describe("compareDictation", () => {
     expect(result.ops).toContainEqual({ type: "replace", ref: "one", student: "nine" });
     expect(result.ops).toContainEqual({ type: "insert", student: "ten" });
     expect(result.ops).toContainEqual({ type: "insert", student: "eleven" });
-    expect(result.errors).toBe(1);
+    // One swap plus two extras.
+    expect(result.errors).toBe(3);
   });
 
   it("marks an omitted word as missing", () => {
@@ -83,12 +84,27 @@ describe("compareDictation", () => {
     expect(result.ops).toContainEqual({ type: "delete", ref: "cat" });
   });
 
-  it("flags an added word without counting it as an error", () => {
+  it("counts an added word as an error", () => {
     const result = compareDictation("the cat sat", "the big cat sat");
 
     expect(result.ops).toContainEqual({ type: "insert", student: "big" });
-    expect(result.errors).toBe(0);
-    expect(result.scorePct).toBe(100);
+    expect(result.errors).toBe(1);
+    expect(result.scorePct).toBeCloseTo(66.67, 1);
+  });
+
+  it("charges a swapped word once, not twice", () => {
+    // The word is both missing and extra, but it is a single mistake.
+    expect(compareDictation("the cat sat", "the dog sat").errors).toBe(1);
+  });
+
+  it("floors the score at zero when padding exceeds the reference", () => {
+    const result = compareDictation(
+      "the cat sat",
+      "the cat sat and then a great many further words",
+    );
+
+    expect(result.errors).toBeGreaterThan(result.total);
+    expect(result.scorePct).toBe(0);
   });
 
   it("scores an empty transcription at zero", () => {

@@ -6,7 +6,7 @@ export type DiffOp =
 
 export interface ComparisonResult {
   ops: DiffOp[];
-  /** Wrong words plus missing words. Extra words are shown but not penalised. */
+  /** Wrong words, missing words and extra words — every deviation counts. */
   errors: number;
   /** Token count of the reference text. */
   total: number;
@@ -39,8 +39,8 @@ export function tokenise(text: string): string[] {
  *
  * A plain LCS walk can only delete and insert, so swapping one word for
  * another surfaces as a missing word next to an extra word. Pairing them is
- * what makes the "wrong word" category possible, and it never changes the
- * score: a replacement counts the same as the deletion it replaces.
+ * what makes the "wrong word" category possible, and it also keeps the score
+ * fair: one word written wrong costs one error, not two.
  */
 function mergeReplacements(ops: DiffOp[]): DiffOp[] {
   const merged: DiffOp[] = [];
@@ -138,9 +138,11 @@ export function compareDictation(reference: string, student: string): Comparison
   const studentTokens = tokenise(student);
   const ops = lcsAlign(refTokens, studentTokens);
 
-  const errors = ops.filter((op) => op.type === "replace" || op.type === "delete").length;
+  const errors = ops.filter((op) => op.type !== "ok").length;
   const total = refTokens.length;
-  const scorePct = total > 0 ? ((total - errors) / total) * 100 : 0;
+  // Extra words count as errors, so a padded transcription can exceed the
+  // reference length. Clamp instead of reporting a negative score.
+  const scorePct = total > 0 ? Math.max(0, ((total - errors) / total) * 100) : 0;
 
   return { ops, errors, total, scorePct };
 }
