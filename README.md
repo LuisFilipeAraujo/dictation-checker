@@ -1,36 +1,95 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# British Dictation Checker
 
-## Getting Started
+Corretor de ditados em inglês britânico. O aluno digita o que ouviu, escolhe o número do
+ditado, e a aplicação compara o texto com a referência palavra a palavra — marcando o que
+saiu errado, o que faltou e o que sobrou.
 
-First, run the development server:
+A identidade visual segue a Union Flag (Pantone 280 C e 186 C) sobre fundo pergaminho, com
+tipografia inglesa: Libre Baskerville nos títulos e Cabin — desenhada a partir da Gill Sans —
+na interface.
+
+## Stack
+
+| Camada    | Escolha                                                        |
+| --------- | -------------------------------------------------------------- |
+| Framework | Next.js 16 (App Router) + React 19                             |
+| Linguagem | TypeScript, modo `strict`                                      |
+| Estilo    | Tailwind CSS v4 (tokens em `@theme`, sem `tailwind.config.js`) |
+| Fontes    | `next/font/google`, self-hosted                                |
+| Testes    | Vitest                                                         |
+| Qualidade | ESLint + Prettier                                              |
+| CI        | GitHub Actions                                                 |
+| Deploy    | Vercel _(ainda não conectado — ver o roteiro)_                 |
+
+Requer **Node 24** ou superior, a mesma versão usada no CI.
+
+## Começando
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+A aplicação sobe em [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Comando                | O que faz                                           |
+| ---------------------- | --------------------------------------------------- |
+| `npm run dev`          | Servidor de desenvolvimento                         |
+| `npm run build`        | Build de produção                                   |
+| `npm run start`        | Serve o build de produção                           |
+| `npm run lint`         | ESLint                                              |
+| `npm run typecheck`    | Gera os tipos de rota do Next e roda `tsc --noEmit` |
+| `npm test`             | Suíte de testes, uma passada                        |
+| `npm run test:watch`   | Testes em modo watch                                |
+| `npm run format`       | Aplica o Prettier                                   |
+| `npm run format:check` | Verifica a formatação sem alterar arquivos          |
 
-## Learn More
+> `typecheck` encadeia `next typegen` porque o Next 16 gera tipos como `LayoutProps` durante
+> o build. Sem esse passo, o `tsc` sozinho falha em `app/layout.tsx`.
 
-To learn more about Next.js, take a look at the following resources:
+## Estrutura
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+app/           Rotas, layout e CSS global (App Router)
+components/    Interface — apenas DictationChecker.tsx é client component
+lib/           Lógica pura de correção, com os testes ao lado
+.github/       Pipeline de CI
+docs/          Roteiro do projeto e regras de correção
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+A lógica de correção em `lib/` não toca no DOM e não monta HTML: ela devolve operações de
+diff e a pontuação, e quem renderiza é o React. Isso é o que permite reaproveitá-la no
+servidor quando o envio por email entrar (Fase 4), recalculando a nota em vez de confiar no
+que o cliente mandar.
 
-## Deploy on Vercel
+## Como a correção funciona
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Em resumo: o texto é normalizado e quebrado em tokens, alinhado contra a referência por
+subsequência comum mais longa, e cada desvio conta um erro — palavra errada, faltando ou
+extra. A nota é a fração da referência reproduzida corretamente.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+As regras completas, incluindo três bugs de correção que já foram consertados e não devem
+voltar, estão em **[docs/MARKING.md](docs/MARKING.md)**.
+
+## Integração contínua
+
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) roda em todo push no `main` e em todo
+pull request, nesta ordem:
+
+```
+format:check → lint → typecheck → test → build
+```
+
+Para reproduzir o pipeline inteiro localmente antes de abrir um PR:
+
+```bash
+npm run format:check && npm run lint && npm run typecheck && npm test && npm run build
+```
+
+## Roteiro
+
+O projeto nasceu como três arquivos estáticos e está sendo migrado por fases. O que já foi
+feito, o que vem a seguir e as decisões tomadas no caminho estão em
+**[docs/ROADMAP.md](docs/ROADMAP.md)**.
