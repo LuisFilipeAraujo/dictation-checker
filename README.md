@@ -34,20 +34,54 @@ A aplicação sobe em [http://localhost:3000](http://localhost:3000).
 
 ## Scripts
 
-| Comando                | O que faz                                           |
-| ---------------------- | --------------------------------------------------- |
-| `npm run dev`          | Servidor de desenvolvimento                         |
-| `npm run build`        | Build de produção                                   |
-| `npm run start`        | Serve o build de produção                           |
-| `npm run lint`         | ESLint                                              |
-| `npm run typecheck`    | Gera os tipos de rota do Next e roda `tsc --noEmit` |
-| `npm test`             | Suíte de testes, uma passada                        |
-| `npm run test:watch`   | Testes em modo watch                                |
-| `npm run format`       | Aplica o Prettier                                   |
-| `npm run format:check` | Verifica a formatação sem alterar arquivos          |
+**O comando que importa antes de abrir um PR:**
+
+```bash
+npm run verify
+```
+
+Ele roda o portão inteiro — formatação, lint, tipos, testes e build — na mesma ordem do CI,
+parando no primeiro que falhar.
+
+### Desenvolvimento
+
+| Comando              | O que faz                           |
+| -------------------- | ----------------------------------- |
+| `npm run dev`        | Servidor de desenvolvimento         |
+| `npm run build`      | Build de produção                   |
+| `npm run start`      | Serve o build de produção           |
+| `npm run clean`      | Apaga `.next/` e `coverage/`        |
+| `npm run test:watch` | Testes em modo watch, durante o TDD |
+
+### Verificação
+
+| Comando                 | O que faz                                              |
+| ----------------------- | ------------------------------------------------------ |
+| `npm run verify`        | Tudo abaixo, em sequência — o portão do CI             |
+| `npm run format:check`  | Verifica a formatação sem alterar arquivos             |
+| `npm run lint`          | ESLint                                                 |
+| `npm run typecheck`     | Gera os tipos de rota do Next e roda `tsc --noEmit`    |
+| `npm test`              | Suíte de testes, uma passada                           |
+| `npm run test:coverage` | Testes com cobertura; detalhe por linha em `coverage/` |
+| `npm run audit`         | `npm audit`, falhando em severidade alta ou crítica    |
+
+### Correção automática
+
+| Comando            | O que faz                                 |
+| ------------------ | ----------------------------------------- |
+| `npm run format`   | Aplica o Prettier                         |
+| `npm run lint:fix` | Aplica as correções automáticas do ESLint |
+
+Duas notas sobre escolhas que não são óbvias:
 
 > `typecheck` encadeia `next typegen` porque o Next 16 gera tipos como `LayoutProps` durante
 > o build. Sem esse passo, o `tsc` sozinho falha em `app/layout.tsx`.
+
+> `audit` usa `--audit-level=high` de propósito. Um aviso moderado numa dependência
+> transitiva de desenvolvimento não deve travar um merge; alto ou crítico, sim.
+
+A cobertura é medida apenas sobre `lib/`, onde vivem as regras de correção. A interface é
+verificada dirigindo a aplicação de verdade, não por contagem de linhas.
 
 ## Estrutura
 
@@ -76,17 +110,21 @@ voltar, estão em **[docs/MARKING.md](docs/MARKING.md)**.
 ## Integração contínua
 
 [`.github/workflows/ci.yml`](.github/workflows/ci.yml) roda em todo push no `main` e em todo
-pull request, nesta ordem:
+pull request, em dois jobs paralelos:
 
-```
-format:check → lint → typecheck → test → build
-```
+| Job      | O que roda                                          |
+| -------- | --------------------------------------------------- |
+| `verify` | `format:check → lint → typecheck → test → build`    |
+| `audit`  | `npm audit`, falhando em severidade alta ou crítica |
 
-Para reproduzir o pipeline inteiro localmente antes de abrir um PR:
+O `verify` restaura `.next/cache` entre execuções com `actions/cache`. O Next compartilha um
+cache de build nesse diretório; sem persistí-lo, todo build parte do zero e o Next reporta
+"No Cache Detected".
 
-```bash
-npm run format:check && npm run lint && npm run typecheck && npm test && npm run build
-```
+O `audit` é um job separado de propósito: um aviso de segurança novo numa dependência não
+tem relação com a qualidade do código do PR, e separá-lo deixa claro qual dos dois falhou.
+
+Para reproduzir tudo localmente antes de abrir um PR: `npm run verify`.
 
 ## Roteiro
 

@@ -14,6 +14,16 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: ["./vitest.setup.ts"],
     include: ["**/*.test.{ts,tsx}"],
-    exclude: ["node_modules/**", ".next/**", "legacy/**"],
+    exclude: ["node_modules/**", ".next/**"],
+    coverage: {
+      provider: "v8",
+      // The `text` table renders empty on Windows paths; `text-summary`
+      // prints the totals correctly and `html` carries the per-line detail.
+      reporter: ["text-summary", "html"],
+      // Only the marking logic carries rules worth measuring; the UI is
+      // covered by driving the app, not by line counts.
+      include: ["lib/**/*.ts"],
+      exclude: ["lib/**/*.test.ts", "lib/dictations.ts"],
+    },
   },
 });
