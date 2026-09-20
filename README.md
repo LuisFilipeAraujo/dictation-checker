@@ -126,6 +126,18 @@ tem relação com a qualidade do código do PR, e separá-lo deixa claro qual do
 
 Para reproduzir tudo localmente antes de abrir um PR: `npm run verify`.
 
+O workflow declara `permissions: contents: read` e fixa as actions por SHA de commit, não
+por tag — uma tag pode ser reapontada por quem controla a action. O
+[Dependabot](.github/dependabot.yml) mantém os pins e as dependências npm atualizados.
+
+## Segurança e dados
+
+Hoje a aplicação não armazena nada: tudo roda no navegador e some ao recarregar a página.
+A partir da Fase 5 o histórico do aluno guarda id, nome, email, pontuação, erros e data.
+
+O que é coletado e por quê, como relatar uma falha e as regras que as próximas fases
+precisam cumprir antes de entrar estão em **[SECURITY.md](SECURITY.md)**.
+
 ## Roteiro
 
 O projeto nasceu como três arquivos estáticos e está sendo migrado por fases. O que já foi

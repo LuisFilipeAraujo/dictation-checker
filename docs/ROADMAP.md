@@ -88,7 +88,12 @@ Variáveis de ambiente: `RESEND_API_KEY`, `TEACHER_EMAIL`, `UPSTASH_*`.
 - [ ] Tabelas `students` e `attempts` (ditado, texto enviado, erros, percentual, diff, data)
 - [ ] Login por magic link — o aluno já informa o email na Fase 4
 - [ ] Página `/historico` com as tentativas e a evolução do percentual
-- [ ] Row Level Security para cada aluno ver apenas as próprias tentativas
+- [ ] Row Level Security **ativo antes da primeira linha real entrar na tabela**, e testado
+      com dois alunos distintos
+- [ ] Caminho de remoção de conta junto com o cadastro, não depois
+
+As condições de segurança que as Fases 4 e 5 precisam cumprir antes de entrar estão em
+[SECURITY.md](../SECURITY.md), com a justificativa de cada uma.
 
 ## Pendências externas
 

@@ -1,0 +1,25 @@
+version: 2
+
+updates:
+  # The workflow pins actions by commit SHA. Dependabot rewrites those pins
+  # when a new release lands, which is what keeps pinning from becoming stale
+  # dependency debt.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "chore"
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
+    groups:
+      # One PR for the routine patch noise, separate PRs for anything larger.
+      patch-updates:
+        update-types:
+          - patch
